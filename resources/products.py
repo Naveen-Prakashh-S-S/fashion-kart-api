@@ -1,5 +1,5 @@
 from db import db
-from models import ProductModel, ProductTagModel, ProductSizeModel
+from models import ProductModel, ProductTagModel, ProductSizeModel, TagsModel, SizeModel
 from schemas import ProductSizeSchema, ProductSizeCreateSchema, ProductCreateSchema, ProductSchema, PlainProductSchema
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort

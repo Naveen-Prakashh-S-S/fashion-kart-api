@@ -5,6 +5,9 @@ from flask_migrate import Migrate
 import models 
 # Import to Use the Blueprint to Register Line no: 29
 from resources import TagsBlueprint
+from resources import SizesBlueprint
+from resources import ProductsBlueprint
+
 from db import db
 
 
@@ -27,4 +30,6 @@ def create_app():
  
     api = Api(app)
     api.register_blueprint(TagsBlueprint)
+    api.register_blueprint(SizesBlueprint)
+    api.register_blueprint(ProductsBlueprint)
     return app

@@ -2,8 +2,9 @@ from flask import Flask
 from flask_smorest import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-import models
-
+import models 
+# Import to Use the Blueprint to Register Line no: 29
+from resources import TagsBlueprint
 from db import db
 
 
@@ -25,11 +26,5 @@ def create_app():
     migrate.init_app(app, db)
  
     api = Api(app)
- 
+    api.register_blueprint(TagsBlueprint)
     return app
-'''
-"app = create_app()
-
-@app.get("/temp")
-def temp():
-    return "Testing Project '''

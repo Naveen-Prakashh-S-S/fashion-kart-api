@@ -45,9 +45,14 @@ class SingleTag(MethodView):
         db.session.commit()
         return tag
 
+    @blp.response(200)
     def delete(self, tag_id):
         tag = TagsModel.query.get_or_404(tag_id)
-        db.session.delete(tag)
-        db.session.commit()
-        return {"Message" : "Item Deleted"}
+        try:
+            db.session.delete(tag)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            abort(500, message=str(e))
+        return {"message": "Tag deleted successfully."}
             

@@ -1,6 +1,6 @@
 from db import db
 from models import ProductModel, ProductTagModel, ProductSizeModel, TagsModel, SizeModel
-from schemas import ProductSizeSchema, ProductSizeCreateSchema, ProductCreateSchema, ProductSchema, PlainProductSchema
+from schemas import ProductSizeSchema, ProductSizeCreateSchema, ProductCreateSchema, ProductSchema, PlainProductSchema , ProductTagCreateSchema
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
@@ -50,3 +50,103 @@ class ProductBasic(MethodView):
 
             db.session.rollback()
             abort(500, message = "Failed To Create Product")
+
+    @blp.response(200, ProductSchema(many = True))
+    def get(self):
+        return ProductModel.query.all()
+
+@blp.route("/admin/products/<int:product_id>")
+class GetOneProduct(MethodView):
+    @blp.response(201, ProductSchema)
+    def get(self, product_id):
+        return ProductModel.query.get_or_404(product_id)
+    
+    @blp.arguments(ProductCreateSchema)
+    @blp.response(200, ProductSchema)
+    def put(self, product_data, product_id):
+
+        try:
+            # Get Product
+            product = ProductModel.query.get_or_404(product_id)
+
+            # Validate Tags
+            tags = []
+
+            for tag_id in product_data["tags"]:
+
+                tag = TagsModel.query.get(tag_id)
+
+                if not tag:
+                    abort(
+                        400,
+                        message=f"Tag ID {tag_id} does not exist"
+                    )
+
+                tags.append(tag)
+
+            # Validate Sizes
+
+            for size_data in product_data["sizes"]:
+
+                size = SizeModel.query.get(size_data["size_id"])
+
+                if not size:
+                    abort(
+                        400,
+                        message=f"Size ID {size_data['size_id']} does not exist"
+                    )
+
+            # Update Product
+
+            product.name = product_data["name"]
+            product.price = product_data["price"]
+
+            # Update Tags
+
+            product.tags = tags
+
+            # Remove Old Product Sizes
+
+            ProductSizeModel.query.filter_by(
+                product_id=product_id
+            ).delete()
+
+            # Add New Product Sizes
+
+            for size_data in product_data["sizes"]:
+
+                product_size = ProductSizeModel(
+                    product_id=product_id,
+                    size_id=size_data["size_id"],
+                    stock=size_data["stock"]
+                )
+
+                db.session.add(product_size)
+
+            # Save
+
+            db.session.commit()
+
+            return product
+
+        except SQLAlchemyError:
+
+            db.session.rollback()
+
+            abort(
+                500,
+                message="Failed to update Product"
+            )
+
+
+
+@blp.route("/admin/products/<int:product_id>/tags")
+class ProductTag(MethodView):
+    @blp.arguments(ProductTagCreateSchema)
+    @blp.response(200, ProductSchema)
+    def post(self, tag_data, product_id):
+        product = ProductModel.query.get_or_404(product_id)
+        tag = TagsModel.query.get_or_404(tag_data["id"])
+        product.tags.append(tag)
+        db.session.commit()
+        return product

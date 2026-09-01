@@ -8,5 +8,6 @@ from .schema import (
     ProductSizeCreateSchema,
     ProductCreateSchema,
     TagCreateSchema,
-    SizeCreateSchema
+    SizeCreateSchema,
+    ProductTagCreateSchema
 )

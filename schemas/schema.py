@@ -50,6 +50,8 @@ class ProductCreateSchema(Schema):
         required=True
     )
 
+class ProductTagCreateSchema(Schema):
+    id = fields.Int(required=True)
 
 # =========================================================
 # TAG SCHEMAS

@@ -53,6 +53,12 @@ class ProductCreateSchema(Schema):
 class ProductTagCreateSchema(Schema):
     id = fields.Int(required=True)
 
+class ProductAddSize(Schema):
+    id = fields.Int(required = True)
+    stock = fields.Int(required = True)
+
+class ProductStockUpdateSchema(Schema):
+    stock = fields.Int(required=True)
 # =========================================================
 # TAG SCHEMAS
 # =========================================================

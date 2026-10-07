@@ -90,3 +90,13 @@ class PlainSizeSchema(Schema):
 
 class SizeCreateSchema(Schema):
     name = fields.Str(required=True)
+
+
+# =========================================================
+# USER SCHEMAS
+# =========================================================
+
+class UserSchema(Schema):
+    username = fields.Str(required=True)
+    email = fields.Str(required=True)
+    password = fields.Str(required=True)

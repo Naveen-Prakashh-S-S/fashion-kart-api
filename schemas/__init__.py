@@ -11,5 +11,6 @@ from .schema import (
     SizeCreateSchema,
     ProductTagCreateSchema,
     ProductAddSize,
-    ProductStockUpdateSchema
+    ProductStockUpdateSchema,
+    UserSchema
 )

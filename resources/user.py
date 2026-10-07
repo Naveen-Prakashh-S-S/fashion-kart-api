@@ -25,14 +25,17 @@ class Register(MethodView):
 
         return {"Message": "User Registered Successfully"}, 201
         
-@blp.route("/login")
+@blp.route("/user/login")
 class UserLogin(MethodView):
     @blp.arguments(UserLoginSchema)
     def post(self, user_data):
         user = UserModel.query.filter(
-            UserModel.username == user_data["username"] or UserModel.email == user_data["username"]
+            UserModel.username == user_data["username"]
         ).first()
-        
+        if not user:
+            user = UserModel.query.filter(
+                        UserModel.email == user_data["username"]
+                    ).first()
         if user and pbkdf2_sha256.verify(user_data["password"], user.password):
             access_token = create_access_token(identity=str(user.id) , fresh=True)
             refresh_token = create_refresh_token(identity= str(user.id) )

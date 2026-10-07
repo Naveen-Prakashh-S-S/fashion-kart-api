@@ -13,12 +13,12 @@ class Register(MethodView):
     @blp.arguments(UserSchema)
     def post(self, user_data):
         data = UserModel.query.filter_by(username=user_data["username"]).first()
-        if (data):
+        '''if (data):
             abort(400, message = "User Name Already Exists...")
         data = UserModel.query.filter_by(email=user_data["email"]).first()
         if (data):
             abort(400, message = "Email Already Exists...")
-
+        '''
         user = UserModel(username = user_data["username"], email = user_data["email"] ,password = pbkdf2_sha256.hash(user_data["password"]))
         db.session.add(user)
         db.session.commit()

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_smorest import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 import models 
 # Import to Use the Blueprint to Register Line no: 29
 from resources import TagsBlueprint
@@ -23,7 +24,8 @@ def create_app():
  
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///dress_shop.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
- 
+    app.config["JWT_SECRET_KEY"] ="f7bdc3dc618823c1bff9754cdec9b1da9da8e291da481c5d99da5508b13c1f9c"
+    jwt = JWTManager(app)
     db.init_app(app)
     migrate = Migrate()
     migrate.init_app(app, db)

@@ -48,7 +48,7 @@ class SingleTag(MethodView):
     @blp.response(200)
     def delete(self, tag_id):
         tag = TagsModel.query.get_or_404(tag_id)
-        try:
+        try: 
             db.session.delete(tag)
             db.session.commit()
         except SQLAlchemyError as e:

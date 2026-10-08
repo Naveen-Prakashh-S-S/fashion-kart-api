@@ -1,11 +1,12 @@
 from db import db
 from models import UserModel
-from schemas import UserSchema, UserLoginSchema
+from schemas import UserSchema, UserLoginSchema,UserProfileSchema
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import create_access_token, create_refresh_token
 from passlib.hash import pbkdf2_sha256
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
 blp = Blueprint("Users", "user", description = "User Endpoint Operations")
 
@@ -40,5 +41,16 @@ class UserLogin(MethodView):
             access_token = create_access_token(identity=str(user.id) , fresh=True)
             refresh_token = create_refresh_token(identity= str(user.id) )
             return {"access_token": access_token, "refresh token":refresh_token}
-        abort(401, message="Invalid UserName and Password..")     
+        abort(401, message="Invalid UserName and Password..")   
+
+@blp.route("/user/profile")
+class UserProfile(MethodView):
+    @jwt_required()
+    @blp.response(200,UserProfileSchema)
+    def get(self):
+        jwt = get_jwt_identity()
+        user = UserModel.query.get(int(jwt))
+        if not user :
+            abort (404, message = "User not found")
+        return user 
         

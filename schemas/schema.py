@@ -104,3 +104,8 @@ class UserSchema(Schema):
 class UserLoginSchema(Schema):
     username = fields.Str(required=True)
     password = fields.Str(required=True)
+
+class UserProfileSchema(Schema):
+    id = fields.Int()
+    username = fields.Str()
+    email = fields.Str()

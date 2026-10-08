@@ -13,5 +13,6 @@ from .schema import (
     ProductAddSize,
     ProductStockUpdateSchema,
     UserSchema,
-    UserLoginSchema
+    UserLoginSchema,
+    UserProfileSchema
 )

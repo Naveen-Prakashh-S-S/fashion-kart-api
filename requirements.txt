@@ -22,3 +22,4 @@ webargs==8.7.1
 Werkzeug==3.1.8
 passlib
 flask_jwt_extended
+flask

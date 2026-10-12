@@ -1,7 +1,8 @@
 from db import db
-from models import UserModel
-from schemas import UserSchema, UserLoginSchema,UserProfileSchema
+from models import UserModel, ProductModel, TagsModel
+from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema
 from flask.views import MethodView
+from flask import request
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -53,4 +54,32 @@ class UserProfile(MethodView):
         if not user :
             abort (404, message = "User not found")
         return user 
-        
+
+@blp.route("/product")
+class BrowseProduct(MethodView):
+    @blp.response(200, ProductSchema(many = True))
+    def get(self):
+        return ProductModel.query.all()
+
+@blp.route("/product/<int:product_id>")
+class SearchProduct(MethodView):
+    @blp.response(200, ProductSchema)
+    def get(self, product_id):
+        return ProductModel.query.get_or_404(product_id)
+
+@blp.route("/tags/<int:tag_id>/products")
+class SearchTagProduct(MethodView):
+    @blp.response(200, PlainProductSchema(many = True))
+    def get(self, tag_id):
+        tag = TagsModel.query.get_or_404(tag_id)
+        return tag.products
+
+@blp.route("/products/search")
+class SearchByName(MethodView):
+    @blp.response(200, PlainProductSchema(many = True))
+    def get(self):
+        name = request.args.get("name", "").strip()
+
+        products = ProductModel.query.filter( ProductModel.name.ilike(f"%{name}%")).all()
+
+        return products

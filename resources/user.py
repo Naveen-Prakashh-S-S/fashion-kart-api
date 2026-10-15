@@ -96,6 +96,3 @@ class CartInfo(MethodView):
         db.session.add(cart)
         db.session.commit()
         return cart
-
-        
-

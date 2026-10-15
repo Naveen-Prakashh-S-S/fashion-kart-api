@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 
 
 # =========================================================
@@ -109,3 +109,11 @@ class UserProfileSchema(Schema):
     id = fields.Int()
     username = fields.Str()
     email = fields.Str()
+
+# =========================================================
+# CART SCHEMAS
+# =========================================================
+
+class CartSchema(Schema):
+    product_id = fields.Int(required = True)
+    quantity = fields.Int(required = True, validate=validate.Range(min=1))

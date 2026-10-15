@@ -1,6 +1,6 @@
 from db import db
-from models import UserModel, ProductModel, TagsModel
-from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema
+from models import UserModel, ProductModel, TagsModel, CartModel
+from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema, CartSchema
 from flask.views import MethodView
 from flask import request
 from flask_smorest import Blueprint, abort
@@ -79,7 +79,23 @@ class SearchByName(MethodView):
     @blp.response(200, PlainProductSchema(many = True))
     def get(self):
         name = request.args.get("name", "").strip()
-
         products = ProductModel.query.filter( ProductModel.name.ilike(f"%{name}%")).all()
-
         return products
+
+@blp.route("/cart")
+class CartInfo(MethodView):
+    @jwt_required()
+    @blp.arguments(CartSchema)
+    @blp.response(200, CartSchema)
+    def post(self, product):
+        user_id = int(get_jwt_identity())  
+        data = ProductModel.query.filter_by(id = product["product_id"])
+        if not data:
+            abort (404, message = "Product DoestNot Exsist")
+        cart = CartModel(user_id = user_id, product_id = product["product_id"], quantity = product["quantity"])
+        db.session.add(cart)
+        db.session.commit()
+        return cart
+
+        
+

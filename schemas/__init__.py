@@ -15,5 +15,6 @@ from .schema import (
     UserSchema,
     UserLoginSchema,
     UserProfileSchema,
-    CartSchema
+    CartSchema,
+    CartUpdateQuantity
 )

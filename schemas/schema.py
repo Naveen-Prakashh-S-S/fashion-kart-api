@@ -117,3 +117,6 @@ class UserProfileSchema(Schema):
 class CartSchema(Schema):
     product_id = fields.Int(required = True)
     quantity = fields.Int(required = True, validate=validate.Range(min=1))
+
+class CartUpdateQuantity(Schema):
+    quantity = fields.Int(required = True, validate=validate.Range(min=1))

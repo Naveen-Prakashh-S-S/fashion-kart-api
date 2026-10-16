@@ -1,6 +1,6 @@
 from db import db
 from models import UserModel, ProductModel, TagsModel, CartModel
-from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema, CartSchema
+from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema, CartSchema, CartUpdateQuantity
 from flask.views import MethodView
 from flask import request
 from flask_smorest import Blueprint, abort
@@ -103,3 +103,28 @@ class CartInfo(MethodView):
         user_id = int(get_jwt_identity())
         cart_item = CartModel.query.filter_by(user_id = user_id).all()
         return cart_item
+
+@blp.route("/cart/<int:cart_item_id>")
+class CartUpdate(MethodView):
+    @jwt_required()
+    @blp.response(200, CartSchema)
+    @blp.arguments(CartUpdateQuantity)
+    def put(self,  data, cart_item_id):
+        user_id  = int(get_jwt_identity())
+        cart_item = CartModel.query.filter_by(user_id=user_id, product_id=cart_item_id).first()
+        if not cart_item:
+            abort(404, message = "Cart Item Not Found..")
+        cart_item.quantity = data["quantity"]
+        db.session.commit()
+
+    @jwt_required()
+    def delete(self,cart_item_id):
+        user_id  = int(get_jwt_identity())
+        cart_item = CartModel.query.filter_by(user_id=user_id, product_id=cart_item_id).first()
+        if not cart_item:
+            abort(404, message = "Item not found")
+        db.session.delete(cart_item)
+        db.session.commit()
+        return {"Message" : "Delete Done.."}, 200
+        
+

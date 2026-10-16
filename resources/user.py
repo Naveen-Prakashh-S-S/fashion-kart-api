@@ -89,10 +89,17 @@ class CartInfo(MethodView):
     @blp.response(200, CartSchema)
     def post(self, product):
         user_id = int(get_jwt_identity())  
-        data = ProductModel.query.filter_by(id = product["product_id"])
+        data = ProductModel.query.filter_by(id = product["product_id"]).first()
         if not data:
             abort (404, message = "Product DoestNot Exsist")
         cart = CartModel(user_id = user_id, product_id = product["product_id"], quantity = product["quantity"])
         db.session.add(cart)
         db.session.commit()
         return cart
+
+    @jwt_required()
+    @blp.response(200, CartSchema(many = True))
+    def get(self):
+        user_id = int(get_jwt_identity())
+        cart_item = CartModel.query.filter_by(user_id = user_id).all()
+        return cart_item

@@ -116,7 +116,30 @@ class UserProfileSchema(Schema):
 
 class CartSchema(Schema):
     product_id = fields.Int(required = True)
+    size_id = fields.Int(required = True)
     quantity = fields.Int(required = True, validate=validate.Range(min=1))
 
 class CartUpdateQuantity(Schema):
     quantity = fields.Int(required = True, validate=validate.Range(min=1))
+
+
+# =========================================================
+# ORDER SCHEMAS
+# =========================================================
+
+class OrderItemSchema(Schema):
+    id = fields.Int(dump_only=True)
+    product_id = fields.Int(required=True)
+    quantity = fields.Int(required=True)
+    price = fields.Float(dump_only=True)
+
+
+class OrderSchema(Schema):
+    id = fields.Int(dump_only=True)
+    user_id = fields.Int(dump_only=True)
+    status = fields.Str(dump_only=True)
+    total_price = fields.Float(dump_only=True)
+    items = fields.List(
+        fields.Nested(OrderItemSchema),
+        dump_only=True
+    )

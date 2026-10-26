@@ -9,6 +9,7 @@ from resources import TagsBlueprint
 from resources import SizesBlueprint
 from resources import ProductsBlueprint
 from resources import UserBluprint
+from resources import OrderBluprint
 from db import db
 
 
@@ -35,4 +36,5 @@ def create_app():
     api.register_blueprint(SizesBlueprint)
     api.register_blueprint(ProductsBlueprint)
     api.register_blueprint(UserBluprint)
+    api.register_blueprint(OrderBluprint)
     return app

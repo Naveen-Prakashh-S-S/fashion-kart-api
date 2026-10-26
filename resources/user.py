@@ -1,5 +1,5 @@
 from db import db
-from models import UserModel, ProductModel, TagsModel, CartModel
+from models import UserModel, ProductModel, TagsModel, CartModel, SizeModel
 from schemas import UserSchema, UserLoginSchema,UserProfileSchema, ProductSchema, TagSchema, PlainProductSchema, CartSchema, CartUpdateQuantity
 from flask.views import MethodView
 from flask import request
@@ -92,7 +92,14 @@ class CartInfo(MethodView):
         data = ProductModel.query.filter_by(id = product["product_id"]).first()
         if not data:
             abort (404, message = "Product DoestNot Exsist")
-        cart = CartModel(user_id = user_id, product_id = product["product_id"], quantity = product["quantity"])
+        size = SizeModel.query.filter_by(id=product["size_id"]).first()
+
+        if not size:
+            abort(404, message="Selected size does not exist")
+
+        if not any(entry.size.id == size.id for entry in data.sizes):
+            abort(400, message="Selected size is not available for this product")
+        cart = CartModel(user_id = user_id, product_id = product["product_id"], size_id = product["size_id"], quantity = product["quantity"])
         db.session.add(cart)
         db.session.commit()
         return cart

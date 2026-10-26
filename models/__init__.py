@@ -5,3 +5,5 @@ from .product_tags import ProductTagModel
 from .product_size import ProductSizeModel
 from .user import UserModel
 from .cart import CartModel
+from .order import OrderModel
+from .order_item import OrderItemModel

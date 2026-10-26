@@ -9,4 +9,6 @@ class CartModel(db.Model):
 
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable = False)
 
+    size_id = db.Column(db.Integer, db.ForeignKey("sizes.id"), nullable = False)
+
     quantity = db.Column(db.Integer, nullable = False , default = 1)

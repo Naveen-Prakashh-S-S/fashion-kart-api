@@ -20,49 +20,49 @@ class OrderResource(MethodView):
     @jwt_required()
     @blp.response(201, OrderSchema)
     def post(self):
-       user_id = int(get_jwt_identity())
-
-       cart_items = CartModel.query.filter_by(user_id = user_id).all()
-
-       if not cart_items:
-           abort(400, message = "Cart is Items")
-
-       order = OrderModel(user_id = user_id, status = "pending", total_price = 0)
-
-       total_price = 0
-       try:
+        user_id = int(get_jwt_identity())
+        cart_items = CartModel.query.filter_by(user_id=user_id).all()
+        if not cart_items:
+            abort(400, message="Cart is empty")
+        order = OrderModel(user_id=user_id,status="pending",total_price=0)
+        total_price = 0
+        try:
             for cart_item in cart_items:
-                product = ProductModel.query.get(
-                    cart_item.product_id
-                )
-
+                product = db.session.get(ProductModel, cart_item.product_id)
                 if not product:
                     abort(400, message="A product in your cart no longer exists")
+                # Find the selected product-size association
+                size_data = next((entry for entry in product.sizes if entry.size.id == cart_item.size_id),None)
+                if size_data is None:
+                    abort(400,message="Selected size is not available for this product")
+                # Early stock check only; stock is not deducted here
+                if size_data.stock < cart_item.quantity:
+                    abort(400,message="Insufficient stock for the selected size")
 
                 price = product.price
                 quantity = cart_item.quantity
-
-                order_item = OrderItemModel(
-                    product_id=product.id,
-                    quantity=quantity,
-                    price=price
-                )
-
+                order_item = OrderItemModel(product_id=product.id,size_id=cart_item.size_id,quantity=quantity,price=price)
+                
                 order.items.append(order_item)
+                
                 total_price += price * quantity
-
+            
             order.total_price = total_price
-
+            
             db.session.add(order)
+            # Save the order and its items in one transaction
+            
             db.session.flush()
-
+            # Clear the cart after creating the order
+            
             for cart_item in cart_items:
                 db.session.delete(cart_item)
-
+            
             db.session.commit()
-
-       except Exception:
+        
+        except Exception:
+        
             db.session.rollback()
             raise
-
-       return order
+        
+        return order

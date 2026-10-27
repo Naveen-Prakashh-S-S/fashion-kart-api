@@ -111,27 +111,31 @@ class CartInfo(MethodView):
         cart_item = CartModel.query.filter_by(user_id = user_id).all()
         return cart_item
 
+
 @blp.route("/cart/<int:cart_item_id>")
 class CartUpdate(MethodView):
     @jwt_required()
-    @blp.response(200, CartSchema)
     @blp.arguments(CartUpdateQuantity)
-    def put(self,  data, cart_item_id):
-        user_id  = int(get_jwt_identity())
-        cart_item = CartModel.query.filter_by(user_id=user_id, product_id=cart_item_id).first()
+    @blp.response(200, CartSchema)
+    def put(self, data, cart_item_id):
+        user_id = int(get_jwt_identity())
+        cart_item = CartModel.query.filter_by(id = cart_item_id,user_id = user_id).first()
         if not cart_item:
-            abort(404, message = "Cart Item Not Found..")
+            abort(404, message="Cart Item Not Found")
         cart_item.quantity = data["quantity"]
         db.session.commit()
-
+        print(cart_item)
+        return cart_item
+    
     @jwt_required()
-    def delete(self,cart_item_id):
-        user_id  = int(get_jwt_identity())
-        cart_item = CartModel.query.filter_by(user_id=user_id, product_id=cart_item_id).first()
+    def delete(self, cart_item_id):
+        user_id = int(get_jwt_identity())
+        cart_item = CartModel.query.filter_by(id=cart_item_id, user_id=user_id).first()
         if not cart_item:
-            abort(404, message = "Item not found")
+            abort(404, message="Item Not Found")
         db.session.delete(cart_item)
         db.session.commit()
-        return {"Message" : "Delete Done.."}, 200
+        return {"Message": "Delete Done"}, 200
+
         
 

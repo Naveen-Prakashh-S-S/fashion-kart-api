@@ -115,6 +115,7 @@ class UserProfileSchema(Schema):
 # =========================================================
 
 class CartSchema(Schema):
+    id = fields.Int(dump_only = True)
     product_id = fields.Int(required = True)
     size_id = fields.Int(required = True)
     quantity = fields.Int(required = True, validate=validate.Range(min=1))
@@ -139,6 +140,7 @@ class OrderSchema(Schema):
     user_id = fields.Int(dump_only=True)
     status = fields.Str(dump_only=True)
     total_price = fields.Float(dump_only=True)
+    size_id = fields.Int(dump_only = True)
     items = fields.List(
         fields.Nested(OrderItemSchema),
         dump_only=True
